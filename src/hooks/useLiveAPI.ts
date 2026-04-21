@@ -239,6 +239,28 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
                   properties: { color: { type: Type.STRING, description: "Couleur (code hexa ou nom anglais)" } },
                   required: ["color"]
                 }
+              },
+              {
+                name: "save_memory",
+                description: "Sauvegarder une information importante dans la mémoire à long terme pour s'en souvenir lors des prochaines sessions.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { 
+                    text: { type: Type.STRING, description: "L'information à mémoriser (sois précis)" } 
+                  },
+                  required: ["text"]
+                }
+              },
+              {
+                name: "search_memory",
+                description: "Rechercher dans la mémoire à long terme des informations sur l'utilisateur ou des événements passés.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { 
+                    query: { type: Type.STRING, description: "La question ou le sujet à rechercher" } 
+                  },
+                  required: ["query"]
+                }
               }
             ]
           }]

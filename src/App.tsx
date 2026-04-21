@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useLiveAPI } from './hooks/useLiveAPI';
 import { useCamera } from './hooks/useCamera';
 import { useWaveform } from './hooks/useWaveform';
+import { useMemory } from './hooks/useMemory';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -19,6 +20,11 @@ export default function App() {
   const [showDevPanel, setShowDevPanel] = useState(true);
   const [skills, setSkills] = useState('');
 
+  const apiKey = process.env.GEMINI_API_KEY || '';
+
+  // Memory Hook
+  const { store, search } = useMemory({ apiKey });
+
   // Load Skills on Mount
   useEffect(() => {
     loadSkills().then(setSkills);
@@ -32,9 +38,13 @@ export default function App() {
       const color = call.args.color || '#00FF9C';
       setSmartLight(color);
       return { status: "success", applied_color: color };
+    } else if (call.name === "save_memory") {
+      return await store(call.args.text);
+    } else if (call.name === "search_memory") {
+      return await search(call.args.query);
     }
     return {};
-  }, []);
+  }, [store, search]);
 
   // Main API Hook
   const {
@@ -47,7 +57,7 @@ export default function App() {
     sendRealtimeInput,
     analyser
   } = useLiveAPI({
-    apiKey: process.env.GEMINI_API_KEY || '',
+    apiKey,
     voiceName,
     systemInstruction: getSystemInstruction(skills),
     onToolCall: handleToolCall

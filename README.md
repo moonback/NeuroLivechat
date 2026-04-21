@@ -5,7 +5,8 @@ Une interface d'intelligence artificielle de pointe, sophistiquée et extrêmeme
 ## ✨ Caractéristiques Uniques
 
 - **🌀 Fusion Multimodale** : Interaction fluide combinant la voix (PCM 16k/24k) et la vision (Webcam) pour une perception temps réel de l'environnement.
-- **🛠️ Système de Skills (Markdown)** : Architecture extensible permettant d'ajouter des compétences complexes via de simples fichiers `.md` sans modifier le code source.
+- **🧠 Mémoire Sémantique Locale** : Système de persistance à long terme utilisant le modèle `gemini-embedding-2-preview` pour se souvenir de l'utilisateur et du contexte entre les sessions.
+- **🛠️ Système de Skills (Markdown)** : Architecture extensible permettant d'ajouter des compétences complexes via de simples fichiers `.md`.
 - **🎨 Design Premium** : Interface ultra-moderne utilisant des effets de flou (glassmorphism), des dégradés néon et des micro-animations fluides.
 - **⚡ Latence Ultra-Faible** : Optimisation des WebSockets pour des réponses quasi-instantanées et une gestion naturelle des interruptions.
 - **🔬 Télémétrie Avancée** : Analyseur de fréquences (FFT) intégré, logs système détaillés et monitoring de l'état de la connexion.
