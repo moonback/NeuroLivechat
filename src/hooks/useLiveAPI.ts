@@ -316,6 +316,17 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
                   },
                   required: ["action"]
                 }
+              },
+              {
+                name: "web_search",
+                description: "Rechercher des informations sur internet en temps réel.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { 
+                    query: { type: Type.STRING, description: "La requête de recherche." } 
+                  },
+                  required: ["query"]
+                }
               }
             ]
           }]

@@ -150,8 +150,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </AnimatePresence>
       </div>
-
-
+      
+      {/* Skill Intelligence Status */}
+      <div className="mt-auto pt-6 border-t border-brand-border flex flex-col gap-3">
+        <div className="flex items-center gap-3 px-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-widest font-black">Online Intelligence</span>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <div className="w-1 h-1 rounded-full bg-emerald-500" />
+            <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-tighter">Web access</span>
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+            <div className="w-1 h-1 rounded-full bg-blue-500" />
+            <span className="text-[8px] font-bold text-blue-500 uppercase tracking-tighter">Vision sensor</span>
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-purple-500/10 border border-purple-500/20">
+            <div className="w-1 h-1 rounded-full bg-purple-500" />
+            <span className="text-[8px] font-bold text-purple-500 uppercase tracking-tighter">Memory</span>
+          </div>
+        </div>
+      </div>
     </aside>
   );
 };

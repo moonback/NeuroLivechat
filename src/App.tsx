@@ -64,6 +64,26 @@ export default function App() {
       const { action } = call.args;
       setIsCameraEnabled(action === "enable");
       return { status: "success", camera_enabled: action === "enable" };
+    } else if (call.name === "web_search") {
+      const { query } = call.args;
+      try {
+        // En conditions réelles, on utiliserait une API comme Google Custom Search ou SerpApi.
+        // Pour la démo, on simule une recherche avec des résultats structurés.
+        console.log(`[Web Search] Query: ${query}`);
+        
+        // Simulation d'un délai réseau
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        return {
+          results: [
+            { title: `Résultats pour "${query}"`, snippet: `Ceci est une simulation de recherche internet pour "${query}". Dans une version de production, cet outil se connecterait à une API de recherche temps réel.` },
+            { title: "NeuroLivechat Intelligence", snippet: "Le système NeuroLivechat intègre désormais des capacités de navigation web avancées pour enrichir les interactions." }
+          ],
+          context: "Recherche effectuée avec succès."
+        };
+      } catch (error) {
+        return { error: "Échec de la recherche web" };
+      }
     }
     return {};
   }, [store, search]);
