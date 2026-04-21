@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hw-bg: #0F1012;
+  --color-hw-panel: #1A1C1F;
+  --color-hw-panel-light: #25282C;
+  --color-hw-panel-border: #333333;
+  --color-hw-accent: #00FF9C;
+  --color-hw-accent-dim: rgba(0, 255, 156, 0.1);
+  --color-hw-error: #FF4D4D;
+  --color-hw-text: #E2E8F0;
+  --color-hw-text-dim: #64748B;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+body {
+  background-color: var(--color-hw-bg);
+  color: var(--color-hw-text);
+  margin: 0;
+  padding: 0;
+}
