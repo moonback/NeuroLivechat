@@ -11,14 +11,16 @@ import { ChatTranscript } from './components/ChatTranscript';
 import { ControlFooter } from './components/ControlFooter';
 
 import { getSystemInstruction } from './constants/prompts';
+import { taskService } from './utils/taskService';
 import { loadSkills } from './utils/skillLoader';
 
 export default function App() {
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [voiceName, setVoiceName] = useState('Puck');
-  const [smartLight, setSmartLight] = useState('#00FF9C');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showDevPanel, setShowDevPanel] = useState(true);
   const [skills, setSkills] = useState('');
+  const [taskCount, setTaskCount] = useState(taskService.getPendingCount());
 
   const apiKey = process.env.GEMINI_API_KEY || '';
 
@@ -34,10 +36,23 @@ export default function App() {
   const handleToolCall = useCallback(async (call: any) => {
     if (call.name === "get_weather") {
       return { temperature: "21°C", condition: "Pluvieux", location: call.args.location };
-    } else if (call.name === "set_light_color") {
-      const color = call.args.color || '#00FF9C';
-      setSmartLight(color);
-      return { status: "success", applied_color: color };
+    } else if (call.name === "manage_tasks") {
+      const { action, text } = call.args;
+      if (action === "add" && text) {
+        taskService.add(text);
+      } else if (action === "remove" && text) {
+        taskService.remove(text);
+      }
+      const tasks = taskService.getAll();
+      setTaskCount(taskService.getPendingCount());
+      return { status: "success", tasks: tasks.map(t => t.text) };
+    } else if (call.name === "get_info") {
+      return { 
+        time: new Date().toLocaleTimeString(), 
+        date: new Date().toLocaleDateString(),
+        platform: navigator.platform,
+        userAgent: navigator.userAgent
+      };
     } else if (call.name === "save_memory") {
       return await store(call.args.text);
     } else if (call.name === "search_memory") {
@@ -118,7 +133,7 @@ export default function App() {
 
         {/* Global Telemetry Bar */}
         <ControlFooter 
-          smartLight={smartLight}
+          taskCount={taskCount}
           messageCount={messages.length}
           isConnected={isConnected}
         />

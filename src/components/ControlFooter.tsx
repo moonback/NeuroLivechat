@@ -2,20 +2,20 @@ import React from 'react';
 import { Cpu, Wifi, Activity, Terminal } from 'lucide-react';
 
 interface ControlFooterProps {
-  smartLight: string;
+  taskCount: number;
   messageCount: number;
   isConnected: boolean;
 }
 
-export const ControlFooter: React.FC<ControlFooterProps> = ({ smartLight, messageCount, isConnected }) => {
+export const ControlFooter: React.FC<ControlFooterProps> = ({ taskCount, messageCount, isConnected }) => {
   return (
     <footer className="col-span-full h-14 glass border-t border-brand-border px-8 hidden md:flex items-center justify-between z-10">
       <div className="flex items-center gap-10">
         <div className="flex items-center gap-3">
           <Terminal className="w-3.5 h-3.5 text-brand-text-dim" />
           <div className="flex flex-col">
-            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">System Ops</span>
-            <span className="text-[11px] font-mono font-bold">{messageCount * 2 + 13} LOGS</span>
+            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">System Logs</span>
+            <span className="text-[11px] font-mono font-bold">{messageCount * 2 + 13} EVENTS</span>
           </div>
         </div>
 
@@ -24,9 +24,9 @@ export const ControlFooter: React.FC<ControlFooterProps> = ({ smartLight, messag
         <div className="flex items-center gap-3">
           <Activity className="w-3.5 h-3.5 text-brand-text-dim" />
           <div className="flex flex-col">
-            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">Heartbeat</span>
+            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">Identity Status</span>
             <span className={`text-[11px] font-mono font-bold ${isConnected ? 'text-brand-primary' : 'text-slate-600'}`}>
-              {isConnected ? 'STABLE' : 'IDLE'}
+              {isConnected ? 'LIVE' : 'IDLE'}
             </span>
           </div>
         </div>
@@ -34,16 +34,12 @@ export const ControlFooter: React.FC<ControlFooterProps> = ({ smartLight, messag
         <div className="h-6 w-[1px] bg-brand-border" />
 
         <div className="flex items-center gap-3">
-          <div 
-            className="w-4 h-4 rounded-full border border-white/10 shadow-lg transition-all duration-700" 
-            style={{ 
-              backgroundColor: smartLight, 
-              boxShadow: `0 0 15px ${smartLight}` 
-            }} 
-          />
+          <div className={`w-4 h-4 rounded flex items-center justify-center text-[10px] font-bold ${taskCount > 0 ? 'bg-brand-primary text-black shadow-[0_0_10px_#00FF9C]' : 'bg-brand-border text-brand-text-dim'}`}>
+            {taskCount}
+          </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">Env Sync</span>
-            <span className="text-[11px] font-mono font-bold uppercase">{smartLight}</span>
+            <span className="text-[9px] font-mono text-brand-text-dim uppercase tracking-tighter">Agenda</span>
+            <span className="text-[11px] font-mono font-bold uppercase">{taskCount} TÂCHES</span>
           </div>
         </div>
       </div>

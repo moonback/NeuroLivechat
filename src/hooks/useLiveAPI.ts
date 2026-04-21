@@ -232,12 +232,24 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
                 }
               },
               {
-                name: "set_light_color",
-                description: "Changer la couleur domotique RVB",
+                name: "manage_tasks",
+                description: "Gérer la liste des tâches (ajouter, lister, supprimer)",
                 parameters: {
                   type: Type.OBJECT,
-                  properties: { color: { type: Type.STRING, description: "Couleur (code hexa ou nom anglais)" } },
-                  required: ["color"]
+                  properties: { 
+                    action: { type: Type.STRING, enum: ["add", "list", "remove"], description: "Action à effectuer" },
+                    text: { type: Type.STRING, description: "Le texte de la tâche (requis pour 'add' ou 'remove')" }
+                  },
+                  required: ["action"]
+                }
+              },
+              {
+                name: "get_info",
+                description: "Obtenir des informations système (Heure, Date, Navigateur)",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {},
+                  required: []
                 }
               },
               {
