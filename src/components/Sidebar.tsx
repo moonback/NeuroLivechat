@@ -7,6 +7,8 @@ interface SidebarProps {
   isConnecting: boolean;
   isCameraEnabled: boolean;
   setIsCameraEnabled: (val: boolean) => void;
+  isVisionContinue: boolean;
+  setIsVisionContinue: (val: boolean) => void;
   voiceName: string;
   setVoiceName: (val: string) => void;
   onConnect: () => void;
@@ -20,6 +22,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isConnecting,
   isCameraEnabled,
   setIsCameraEnabled,
+  isVisionContinue,
+  setIsVisionContinue,
   voiceName,
   setVoiceName,
   onConnect,
@@ -108,6 +112,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {isCameraEnabled ? <Camera className="w-4 h-4" /> : <CameraOff className="w-4 h-4" />}
                 </button>
              </div>
+
+             {isCameraEnabled && (
+               <div className="flex items-center justify-between pt-2 border-t border-brand-border/30">
+                  <div className="flex flex-col">
+                     <span className="text-[10px] text-brand-text-dim uppercase font-bold tracking-tight">Vision Continue</span>
+                     <span className="text-[9px] text-brand-primary/60 font-mono tracking-tighter">High-freq Analysis</span>
+                  </div>
+                  <button 
+                    onClick={() => setIsVisionContinue(!isVisionContinue)} 
+                    className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all border ${isVisionContinue ? 'bg-brand-primary/20 border-brand-primary text-brand-primary shadow-[0_0_10px_rgba(var(--color-brand-primary-rgb),0.2)]' : 'bg-black/40 border-brand-border text-brand-text-dim'}`}
+                  >
+                    {isVisionContinue ? 'ACTIVE' : 'INACTIVE'}
+                  </button>
+               </div>
+             )}
 
              <AnimatePresence>
                 {isCameraEnabled && (

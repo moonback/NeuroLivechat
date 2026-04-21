@@ -21,6 +21,7 @@ export default function App() {
   const [showDevPanel, setShowDevPanel] = useState(true);
   const [skills, setSkills] = useState('');
   const [taskCount, setTaskCount] = useState(taskService.getPendingCount());
+  const [isVisionContinue, setIsVisionContinue] = useState(false);
 
   const apiKey = process.env.GEMINI_API_KEY || '';
 
@@ -81,6 +82,7 @@ export default function App() {
   // Camera Hook
   const { videoRef } = useCamera({
     isCameraEnabled,
+    isVisionContinue,
     onFrame: (data) => sendRealtimeInput({ video: { mimeType: 'image/jpeg', data } })
   });
 
@@ -104,6 +106,8 @@ export default function App() {
           isConnecting={isConnecting}
           isCameraEnabled={isCameraEnabled}
           setIsCameraEnabled={setIsCameraEnabled}
+          isVisionContinue={isVisionContinue}
+          setIsVisionContinue={setIsVisionContinue}
           voiceName={voiceName}
           setVoiceName={setVoiceName}
           onConnect={connect}
