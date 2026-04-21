@@ -16,25 +16,19 @@ export const ChatTranscript: React.FC<ChatTranscriptProps> = ({ messages }) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 min-h-0 glass-light rounded-[2rem] border border-brand-border p-6 overflow-hidden flex flex-col relative">
-      <div className="absolute top-4 right-8 flex items-center gap-2">
-         <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-widest font-black opacity-30">Transcript log</span>
-      </div>
-      
+    <div className="flex-1 min-h-0 bg-white/5 rounded-[2.5rem] p-6 lg:p-8 overflow-hidden flex flex-col relative">
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-4 scroll-smooth"
+        className="flex-1 overflow-y-auto space-y-6 pr-4 scroll-smooth"
       >
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
             <motion.div 
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              className="h-full flex flex-col items-center justify-center text-center gap-2 font-mono"
+              animate={{ opacity: 1 }}
+              className="h-full flex flex-col items-center justify-center text-center gap-3 text-white/40"
             >
-              <div className="w-12 h-[1px] bg-brand-text-dim" />
-              <span className="text-[10px] uppercase tracking-[0.4em]">Listening for Neural Sync</span>
-              <div className="w-12 h-[1px] bg-brand-text-dim" />
+              <span className="text-sm tracking-wide">Waiting for conversation to start...</span>
             </motion.div>
           )}
 
@@ -43,31 +37,30 @@ export const ChatTranscript: React.FC<ChatTranscriptProps> = ({ messages }) => {
               key={m.id}
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              className={`flex flex-col gap-1.5 p-4 rounded-2xl border transition-all duration-500 ${
+              className={`flex flex-col gap-2 max-w-[85%] ${
                 m.role === 'user' 
-                  ? 'bg-slate-800/10 border-white/5 self-end max-w-[85%] text-slate-400' 
-                  : 'bg-brand-primary/5 border-brand-primary/10 self-start max-w-[85%] text-brand-primary/90'
+                  ? 'self-end items-end' 
+                  : 'self-start items-start'
               }`}
             >
-              <div className="flex items-center gap-2 opacity-40">
-                <span className="text-[9px] font-mono uppercase tracking-[0.2em] font-black">
-                  {m.role === 'user' ? 'Transmission' : 'Synthesis'}
-                </span>
-                <div className="w-1 h-1 rounded-full bg-current" />
-                <span className="text-[9px] font-mono">
-                  {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </span>
+              <div 
+                className={`py-3 px-5 rounded-3xl ${
+                  m.role === 'user'
+                    ? 'bg-white text-black rounded-tr-md'
+                    : 'bg-white/10 text-white rounded-tl-md'
+                }`}
+              >
+                <p className="text-[15px] leading-relaxed.5 whitespace-pre-wrap">
+                  {m.text}
+                </p>
               </div>
-              <p className="text-[13px] leading-relaxed font-medium whitespace-pre-wrap">
-                {m.text}
-              </p>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
       {/* Fade at top */}
-      <div className="absolute top-4 left-6 right-6 h-12 bg-gradient-to-b from-[var(--color-brand-panel-light)] to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
     </div>
   );
 };

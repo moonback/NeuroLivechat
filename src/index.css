@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #00FF9C;
-  --color-brand-secondary: #00D1FF;
-  --color-brand-bg: #0A0B0D;
-  --color-brand-panel: rgba(26, 28, 31, 0.8);
-  --color-brand-panel-light: rgba(37, 40, 44, 0.6);
-  --color-brand-border: rgba(255, 255, 255, 0.08);
+  --color-brand-primary: #FFFFFF;
+  --color-brand-secondary: #E5E7EB;
+  --color-brand-bg: #000000;
+  --color-brand-panel: rgba(20, 20, 20, 0.8);
+  --color-brand-panel-light: rgba(30, 30, 30, 0.6);
+  --color-brand-border: rgba(255, 255, 255, 0.1);
   --color-brand-text: #F8FAFC;
-  --color-brand-text-dim: #94A3B8;
-  --color-brand-error: #FF4D4D;
-  
+  --color-brand-text-dim: #A1A1AA;
+  --color-brand-error: #EF4444;
+
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
@@ -19,7 +19,7 @@
 }
 
 :root {
-  --glare-gradient: radial-gradient(circle at 50% 0%, rgba(0, 255, 156, 0.1) 0%, transparent 70%);
+  --glare-gradient: none;
 }
 
 body {
@@ -36,26 +36,26 @@ body {
 /* Custom Utilities */
 .glass {
   background: var(--color-brand-panel);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--color-brand-border);
   box-shadow: var(--shadow-glass);
 }
 
 .glass-light {
   background: var(--color-brand-panel-light);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--color-brand-border);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+  background: linear-gradient(135deg, #FFF, #A1A1AA);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .status-glow {
-  box-shadow: 0 0 15px var(--color-brand-primary);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
 }
 
 ::-webkit-scrollbar {
@@ -73,4 +73,15 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brand-text-dim);
+}
+
+/* ChatGPT Live Orb Custom Animation */
+@keyframes orb-pulse {
+  0% { transform: scale(1); opacity: 0.8; filter: blur(10px); }
+  50% { transform: scale(1.05); opacity: 1; filter: blur(12px); }
+  100% { transform: scale(1); opacity: 0.8; filter: blur(10px); }
+}
+
+.animate-orb {
+  animation: orb-pulse 2s ease-in-out infinite;
 }
