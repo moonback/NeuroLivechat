@@ -305,6 +305,17 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
                   },
                   required: ["query"]
                 }
+              },
+              {
+                name: "manage_vision",
+                description: "Activer ou désactiver le capteur optique (caméra) pour voir l'environnement.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { 
+                    action: { type: Type.STRING, enum: ["enable", "disable"], description: "L'état souhaité pour la caméra." } 
+                  },
+                  required: ["action"]
+                }
               }
             ]
           }]

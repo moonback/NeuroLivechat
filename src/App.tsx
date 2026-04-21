@@ -60,6 +60,10 @@ export default function App() {
       return await store(call.args.text);
     } else if (call.name === "search_memory") {
       return await search(call.args.query);
+    } else if (call.name === "manage_vision") {
+      const { action } = call.args;
+      setIsCameraEnabled(action === "enable");
+      return { status: "success", camera_enabled: action === "enable" };
     }
     return {};
   }, [store, search]);
