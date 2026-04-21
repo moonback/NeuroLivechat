@@ -1,28 +1,35 @@
-# Roadmap & Évolutions
+# 🗺️ Roadmap & Évolutions - Neuro-Live AI
 
-Cette feuille de route définit les futures étapes de développement pour le **Gemini Live Assistant**.
+Cette feuille de route définit les étapes de développement pour l'écosystème **Neuro-Live**.
 
-## Phase 1 : Fondation (✅ Terminée)
+## Phase 1 : Cœur & Connectivité (✅ Terminée)
 - [x] Connexion WebSocket à la Live API (`gemini-3.1-flash-live-preview`).
-- [x] Transmission et lecture audio bidirectionnelle via WebAudio API (PCM 16k/24k).
-- [x] Interface utilisateur "Hardware / Spécialiste" avec barres d'activité visuelles.
-- [x] Gestion des transcriptions vocales (Utilisateur et Gemini).
-- [x] Logique d'interruption vocale de l'IA (coupure de la parole).
-- [x] Isolation du prompt système dans une constante sécurisée.
+- [x] Transmission et lecture audio bidirectionnelle via WebAudio API.
+- [x] Gestion des transcriptions vocales en temps réel.
+- [x] Logique d'interruption vocale "Naturel" (VAD).
 
-## Phase 2 : Enrichissement Multimodal (Court terme)
-- [ ] **Flux Vidéo en Temps Réel** : Envoyer les trames de la webcam encodées en base64 pour permettre à l'IA de voir et réagir à l'environnement.
-- [ ] **Appel de Fonctions (Tool Calling)** : Connecter la Live API à des fonctions locales (ex: récupérer la météo, contrôle domotique simulé) directement déclenchables par la voix.
-- [ ] **Sélecteur de Voix** : Ajouter un panneau technique caché (mot de passe ou manipulation de l'UI paramétrée) pour basculer entre les différentes voix (Puck, Charon, Kore, Fenrir, Zephyr).
-- [ ] **Analyseur Audio Avancé** : Remplacer l'animation factice des `wave-bar` par une véritable analyse de fréquences (AnalyserNode FFT) de la voix.
+## Phase 2 : Immersion & Design (✅ Terminée)
+- [x] **Refonte Design Premium** : Interface Glassmorphism ultra-moderne.
+- [x] **Analyseur Audio FFT** : Visualisation réelle des fréquences sonores.
+- [x] **Flux Vidéo Live** : Intégration de la webcam pour la vision IA.
+- [x] **Architecture Modulaire** : Isolation de la logique dans des hooks et composants.
 
-## Phase 3 : Interface et UX Avancées (Moyen terme)
-- [ ] **Contrôles Audio Fonctionnels** : Rendre les potentiomètres "Gain" et "Threshold" actifs pour ajuster la réceptivité du microphone.
-- [ ] **Exportation de Session** : Bouton pour télécharger les logs (transcriptions et événements techniques) au format texte brut ou markdown.
-- [ ] **Mécanisme de Reconnexion** : Gestion automatisée et silencieuse des micro-coupures du réseau WebSocket (stratégie de reconnexion avec backoff exponentiel).
-- [ ] **Outils Visuels Riches** : Implémenter le retour de données formatées (Grounding Search, Maps) de la Live API lorsqu'elle s'intègrera aux outils.
+## Phase 3 : Intelligence Extensible (✅ Terminée)
+- [x] **Skill System (Markdown)** : Chargement dynamique de compétences via fichiers `.md`.
+- [x] **Appel de Fonctions (Tool Calling)** : Météo et Domotique opérationnelles.
+- [x] **Configuration de Voix** : Sélecteur de signatures vocales intégré.
 
-## Phase 4 : Industrialisation (Long terme)
-- [ ] **Wake-Word Local** : Implémenter un petit modèle On-Device pour que l'assistant soit à l'écoute d'un mot-clé d'activation (ex: "Hey Puck") avant d'ouvrir le canal WebSocket coûteux.
-- [ ] **Support PWA** : Rendre l'application téléchargeable et utilisable hors navigateur classique (installable en plein écran).
-- [ ] **Backend Relay Server** : Mettre en place un vrai backend NodeJS pour la sécurité de la clé API si l'application est vouée à sortir sur le web de manière publique en B2C.
+## Phase 4 : Persistance & Contextualisation (Prochaines Étapes)
+- [ ] **Mémoire à Long Terme** : Intégration d'une base de données vectorielle (Vector DB) pour que l'IA se souvienne des interactions passées.
+- [ ] **Exportation Multimodale** : Téléchargement des sessions avec transcriptions et captures visuelles.
+- [ ] **Multi-Sessions** : Support pour plusieurs "personnalités" d'IA interchangeables rapidement.
+- [ ] **Gestion des Erreurs Robuste** : Système de reconnexion automatique avec état de persistence.
+
+## Phase 5 : Écosystème & Mobilité (Moyen Terme)
+- [ ] **Compatibilité PWA** : Installation sur mobile avec mode plein écran natif.
+- [ ] **Intégrations IoT Réelles** : Connexion à de vrais hubs domotiques (Home Assistant, Philips Hue).
+- [ ] **Custom TTS/Clonage** : Possibilité d'utiliser des voix personnalisées ou clonées pour l'assistant.
+- [ ] **Mode "Vision Continue"** : Amélioration de la fréquence de rafraîchissement des frames pour une meilleure analyse vidéo.
+
+---
+*Dernière mise à jour : Avril 2026*
