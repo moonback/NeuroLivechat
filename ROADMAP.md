@@ -29,7 +29,7 @@ Cette feuille de route définit les étapes de développement pour l'écosystèm
 - [ ] **Compatibilité PWA** : Installation sur mobile avec mode plein écran natif.
 - [ ] **Intégrations IoT Réelles** : Connexion à de vrais hubs domotiques (Home Assistant, Philips Hue).
 - [ ] **Custom TTS/Clonage** : Possibilité d'utiliser des voix personnalisées ou clonées pour l'assistant.
-- [ ] **Mode "Vision Continue"** : Amélioration de la fréquence de rafraîchissement des frames pour une meilleure analyse vidéo.
+- [x] **Mode "Vision Continue"** : Amélioration de la fréquence de rafraîchissement des frames pour une meilleure analyse vidéo.
 
 ---
 *Dernière mise à jour : Avril 2026*

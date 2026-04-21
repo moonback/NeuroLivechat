@@ -66,6 +66,7 @@ export default function App() {
   const {
     isConnected,
     isConnecting,
+    isReconnecting,
     isAssistantTalking,
     messages,
     connect,
@@ -98,12 +99,14 @@ export default function App() {
         <Header 
           isConnected={isConnected} 
           isConnecting={isConnecting} 
+          isReconnecting={isReconnecting}
         />
 
         {/* Control Center (Sidebar) */}
         <Sidebar 
           isConnected={isConnected}
           isConnecting={isConnecting}
+          isReconnecting={isReconnecting}
           isCameraEnabled={isCameraEnabled}
           setIsCameraEnabled={setIsCameraEnabled}
           isVisionContinue={isVisionContinue}
@@ -123,6 +126,7 @@ export default function App() {
           <MainVisualizer 
             isConnected={isConnected}
             isConnecting={isConnecting}
+            isReconnecting={isReconnecting}
             isAssistantTalking={isAssistantTalking}
             barHeights={barHeights}
             isHighVolume={isHighVolume}

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 interface SidebarProps {
   isConnected: boolean;
   isConnecting: boolean;
+  isReconnecting: boolean;
   isCameraEnabled: boolean;
   setIsCameraEnabled: (val: boolean) => void;
   isVisionContinue: boolean;
@@ -20,6 +21,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   isConnected,
   isConnecting,
+  isReconnecting,
   isCameraEnabled,
   setIsCameraEnabled,
   isVisionContinue,
@@ -54,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
              <Mic className="w-5 h-5 group-hover:-rotate-12 transition-transform" />
           )}
           <span className="relative z-10">
-            {isConnecting ? 'Initialising' : isConnected ? 'Terminate' : 'Initialize'}
+            {isReconnecting ? 'Retry Sync' : isConnecting ? 'Initialising' : isConnected ? 'Terminate' : 'Initialize'}
           </span>
         </button>
       </div>

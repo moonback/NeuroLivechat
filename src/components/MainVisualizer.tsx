@@ -4,6 +4,7 @@ import { Loader2, Mic, MicOff } from 'lucide-react';
 interface MainVisualizerProps {
   isConnected: boolean;
   isConnecting: boolean;
+  isReconnecting: boolean;
   isAssistantTalking: boolean;
   barHeights: number[];
   isHighVolume: boolean[];
@@ -14,6 +15,7 @@ interface MainVisualizerProps {
 export const MainVisualizer: React.FC<MainVisualizerProps> = ({
   isConnected,
   isConnecting,
+  isReconnecting,
   isAssistantTalking,
   barHeights,
   isHighVolume,
@@ -52,9 +54,9 @@ export const MainVisualizer: React.FC<MainVisualizerProps> = ({
       <div className="absolute top-8 left-8 flex flex-col gap-1">
         <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-[0.3em] font-black">Link Status</span>
         <div className="flex items-center gap-2">
-           <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-brand-primary shadow-[0_0_8px_var(--color-brand-primary)]' : 'bg-brand-text-dim'}`} />
+           <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-brand-primary shadow-[0_0_8px_var(--color-brand-primary)]' : isReconnecting || isConnecting ? 'bg-amber-400 animate-pulse' : 'bg-brand-text-dim'}`} />
            <span className="text-xs font-mono font-bold tracking-tighter">
-             {isConnecting ? 'INITIATING_SEQUENCE' : isConnected ? 'STABLE_UPLINK' : 'SYSTEM_IDLE'}
+             {isReconnecting ? 'RE-ESTABLISHING' : isConnecting ? 'INITIATING_SEQUENCE' : isConnected ? 'STABLE_UPLINK' : 'SYSTEM_IDLE'}
            </span>
         </div>
       </div>
@@ -62,7 +64,7 @@ export const MainVisualizer: React.FC<MainVisualizerProps> = ({
       <div className="absolute top-8 right-8 text-right flex flex-col gap-1">
         <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-[0.3em] font-black">Process Mode</span>
         <span className={`text-xs font-mono font-bold ${isAssistantTalking ? 'text-brand-primary' : 'text-brand-text-dim'}`}>
-          {isConnecting ? 'DATA_SYNC...' : isConnected ? (isAssistantTalking ? 'OUTPUT_STREAM' : 'WAITING_VOICE') : 'STANDBY'}
+          {isReconnecting ? 'RETRY_SYNC...' : isConnecting ? 'DATA_SYNC...' : isConnected ? (isAssistantTalking ? 'OUTPUT_STREAM' : 'WAITING_VOICE') : 'STANDBY'}
         </span>
       </div>
 

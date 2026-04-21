@@ -3,9 +3,10 @@ import React from 'react';
 interface HeaderProps {
   isConnected: boolean;
   isConnecting: boolean;
+  isReconnecting: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isConnected, isConnecting }) => {
+export const Header: React.FC<HeaderProps> = ({ isConnected, isConnecting, isReconnecting }) => {
   return (
     <header className="col-span-full h-16 glass flex items-center justify-between px-8 border-b border-brand-border z-10">
       <div className="flex items-center gap-4">
@@ -27,10 +28,10 @@ export const Header: React.FC<HeaderProps> = ({ isConnected, isConnecting }) => 
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3 bg-black/40 rounded-full px-4 py-1.5 border border-brand-border">
           <div className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${
-            isConnected ? 'bg-brand-primary status-glow' : isConnecting ? 'bg-amber-400 animate-pulse' : 'bg-brand-text-dim'
+            isConnected ? 'bg-brand-primary status-glow' : isReconnecting || isConnecting ? 'bg-amber-400 animate-pulse' : 'bg-brand-text-dim'
           }`} />
           <span className="font-mono text-[11px] uppercase tracking-wider font-semibold">
-            {isConnecting ? 'Establishing Link...' : isConnected ? 'Live Connection' : 'System Offline'}
+            {isReconnecting ? 'Re-establishing Link...' : isConnecting ? 'Establishing Link...' : isConnected ? 'Live Connection' : 'System Offline'}
           </span>
         </div>
         

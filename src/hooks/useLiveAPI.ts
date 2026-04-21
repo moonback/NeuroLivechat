@@ -18,6 +18,7 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isAssistantTalking, setIsAssistantTalking] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const sessionRef = useRef<any>(null);
@@ -28,6 +29,9 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
   const nextPlayTimeRef = useRef<number>(0);
   
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const MAX_RECONNECT_ATTEMPTS = 5;
 
   const appendMessage = useCallback((role: 'user' | 'assistant', text: string) => {
     setMessages((prev) => {
@@ -196,18 +200,46 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
     }
   }, [appendMessage, playAudioChunk, onToolCall]);
 
-  const connect = async () => {
-    if (isConnected || isConnecting) return;
+  const attemptReconnect = useCallback(() => {
+    if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
+      console.warn('[Session] Max reconnect attempts reached.');
+      disconnect();
+      return;
+    }
 
-    setIsConnecting(true);
-    setMessages([]);
+    setIsReconnecting(true);
+    setIsConnected(false);
+    
+    reconnectAttemptsRef.current += 1;
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 10000);
+    
+    console.log(`[Session] Reconnecting in ${delay}ms (Attempt ${reconnectAttemptsRef.current})...`);
+    
+    reconnectTimeoutRef.current = setTimeout(() => {
+      connect({ keepMessages: true, isRetry: true });
+    }, delay);
+  }, []);
+
+  const connect = async (options: { keepMessages?: boolean, isRetry?: boolean } = {}) => {
+    if (isConnected || isConnecting) {
+      if (!options.isRetry) return;
+    }
+
+    if (!options.isRetry) {
+      setIsConnecting(true);
+    }
+    
+    if (!options.keepMessages) {
+      setMessages([]);
+    }
 
     try {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 64;
+      }
       nextPlayTimeRef.current = audioContextRef.current.currentTime;
-
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 64;
 
       const ai = new GoogleGenAI({ apiKey });
       const sessionPromise = ai.live.connect({
@@ -284,17 +316,26 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
               startRecording(session);
               setIsConnected(true);
               setIsConnecting(false);
+              setIsReconnecting(false);
+              reconnectAttemptsRef.current = 0;
+              console.log('[Session] Connection established.');
             });
           },
           onmessage: (message: any) => {
             handleMessage(message);
           },
-          onclose: () => {
-            disconnect();
+          onclose: (event: any) => {
+            console.warn('[Session] Connection closed:', event);
+            // If it wasn't a clean close (e.g. user calling disconnect)
+            if (sessionRef.current) {
+              attemptReconnect();
+            } else {
+              disconnect();
+            }
           },
           onerror: (error: any) => {
-            console.error('Session error:', error);
-            disconnect();
+            console.error('[Session] Connection error:', error);
+            attemptReconnect();
           }
         },
       });
@@ -302,6 +343,7 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
     } catch (e) {
       console.error(e);
       setIsConnecting(false);
+      setIsReconnecting(false);
     }
   };
 
@@ -342,6 +384,7 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
   return {
     isConnected,
     isConnecting,
+    isReconnecting,
     isAssistantTalking,
     messages,
     connect,
