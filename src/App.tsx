@@ -9,6 +9,7 @@ import { Sidebar } from './components/Sidebar';
 import { MainVisualizer } from './components/MainVisualizer';
 import { ChatTranscript } from './components/ChatTranscript';
 import { ControlFooter } from './components/ControlFooter';
+import { SettingsModal } from './components/SettingsModal';
 
 import { getSystemInstruction } from './constants/prompts';
 import { taskService } from './utils/taskService';
@@ -22,6 +23,7 @@ export default function App() {
   const [skills, setSkills] = useState('');
   const [taskCount, setTaskCount] = useState(taskService.getPendingCount());
   const [isVisionContinue, setIsVisionContinue] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const apiKey = process.env.GEMINI_API_KEY || '';
 
@@ -117,6 +119,7 @@ export default function App() {
           onDisconnect={disconnect}
           videoRef={videoRef}
           showDevPanel={showDevPanel}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
         {/* Primary Interaction Surface */}
@@ -147,6 +150,18 @@ export default function App() {
         />
 
       </div>
+
+      <SettingsModal 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        voiceName={voiceName}
+        setVoiceName={setVoiceName}
+        isCameraEnabled={isCameraEnabled}
+        setIsCameraEnabled={setIsCameraEnabled}
+        isVisionContinue={isVisionContinue}
+        setIsVisionContinue={setIsVisionContinue}
+        isConnected={isConnected}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ interface SidebarProps {
   setVoiceName: (val: string) => void;
   onConnect: () => void;
   onDisconnect: () => void;
+  onOpenSettings: () => void;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   showDevPanel: boolean;
 }
@@ -30,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setVoiceName,
   onConnect,
   onDisconnect,
+  onOpenSettings,
   videoRef,
   showDevPanel
 }) => {
@@ -40,128 +42,93 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={isConnected ? onDisconnect : onConnect}
           disabled={isConnecting}
-          className={`group relative overflow-hidden flex items-center justify-center gap-3 w-full py-4 rounded-2xl font-bold uppercase tracking-[0.2em] text-sm transition-all duration-300 shadow-lg ${
-            isConnecting 
-              ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-              : isConnected
+          className={`group relative overflow-hidden flex items-center justify-center gap-3 w-full py-4 rounded-2xl font-bold uppercase tracking-[0.2em] text-sm transition-all duration-300 shadow-lg ${isConnecting
+            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+            : isConnected
               ? 'bg-brand-error/10 text-brand-error border border-brand-error/20 hover:bg-brand-error hover:text-white'
               : 'bg-brand-primary text-black hover:scale-[1.02] active:scale-95 shadow-brand-primary/20'
-          }`}
+            }`}
         >
           {isConnecting ? (
-             <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : isConnected ? (
-             <MicOff className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+            <MicOff className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           ) : (
-             <Mic className="w-5 h-5 group-hover:-rotate-12 transition-transform" />
+            <Mic className="w-5 h-5 group-hover:-rotate-12 transition-transform" />
           )}
           <span className="relative z-10">
-            {isReconnecting ? 'Retry Sync' : isConnecting ? 'Initialising' : isConnected ? 'Terminate' : 'Initialize'}
+            {isReconnecting ? 'Réessayer' : isConnecting ? 'Initialisation' : isConnected ? 'Terminer' : 'Commencer'}
           </span>
         </button>
       </div>
 
-      {/* Model Context */}
-      <div className="flex flex-col gap-2 p-4 rounded-2xl bg-black/30 border border-brand-border">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-wider">Engine</span>
-          <Info className="w-3 h-3 text-brand-text-dim opacity-50" />
-        </div>
-        <div className="text-xs font-semibold text-brand-primary flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shadow-[0_0_8px_var(--color-brand-primary)]" />
-          gemini-3.1-flash
-        </div>
-      </div>
 
-      {/* Configuration */}
+
+      {/* Configuration & Controls */}
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 px-1">
-          <Settings2 className="w-3.5 h-3.5 text-brand-text-dim" />
-          <span className="text-[10px] font-mono text-brand-text-dim uppercase tracking-widest font-bold">Parameters</span>
-        </div>
-        
-        <div className="flex flex-col gap-3">
-          {/* Voice Selector */}
-          <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-black/30 border border-brand-border hover:border-brand-primary/30 transition-colors">
-            <label className="text-[10px] text-brand-text-dim uppercase font-bold tracking-tight">Vocal Signature</label>
-            <select 
-              className="bg-transparent border-none outline-none text-sm font-medium text-brand-text cursor-pointer w-full appearance-none pr-6" 
-              value={voiceName} 
-              onChange={e => setVoiceName(e.target.value)} 
-              disabled={isConnected}
-              style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(148, 163, 184, 0.5)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center', backgroundSize: '16px' }}
+        <button
+          onClick={onOpenSettings}
+          className="flex items-center justify-between w-full p-4 rounded-2xl bg-black/30 border border-brand-border hover:border-brand-primary/40 group transition-all duration-300"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-slate-800 text-brand-text-dim group-hover:text-brand-primary group-hover:bg-brand-primary/10 transition-colors">
+              <Settings2 className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-xs font-bold font-mono tracking-tight group-hover:text-brand-text">Config Console</span>
+              <span className="text-[10px] text-brand-text-dim uppercase tracking-widest font-black opacity-50">Parameters</span>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-full border border-brand-border flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
+            <div className="w-1.5 h-1.5 border-t-2 border-r-2 border-brand-primary rotate-45" />
+          </div>
+        </button>
+
+        {/* Live Optic Preview (If Active) */}
+        <AnimatePresence>
+          {isCameraEnabled && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col gap-3 p-4 rounded-3xl bg-black/40 border border-brand-border overflow-hidden"
             >
-              <option value="Puck">Puck (Alto)</option>
-              <option value="Charon">Charon (Bass)</option>
-              <option value="Kore">Kore (Soprano)</option>
-              <option value="Fenrir">Fenrir (Baritone)</option>
-              <option value="Zephyr">Zephyr (Tenor)</option>
-            </select>
-          </div>
-
-          {/* Optic Toggles */}
-          <div className="flex flex-col gap-3 p-3.5 rounded-2xl bg-black/30 border border-brand-border overflow-hidden">
-             <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                   <span className="text-[10px] text-brand-text-dim uppercase font-bold tracking-tight">Optic Sensor</span>
-                   <span className="text-[9px] text-brand-primary/60 font-mono tracking-tighter">Real-time Vision</span>
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse shadow-[0_0_8px_var(--color-brand-primary)]" />
+                  <span className="text-[10px] font-mono text-brand-primary uppercase tracking-[0.2em] font-black">Live Feed</span>
                 </div>
-                <button 
-                  onClick={() => !isConnected && setIsCameraEnabled(!isCameraEnabled)} 
-                  disabled={isConnected} 
-                  className={`p-2 rounded-xl transition-all ${isCameraEnabled ? 'bg-brand-primary text-black shadow-lg shadow-brand-primary/20' : 'bg-slate-800 text-slate-400 opacity-50'}`}
+                <button
+                  onClick={() => setIsCameraEnabled(false)}
+                  className="text-[10px] font-mono text-brand-text-dim hover:text-brand-error transition-colors uppercase tracking-widest"
                 >
-                  {isCameraEnabled ? <Camera className="w-4 h-4" /> : <CameraOff className="w-4 h-4" />}
+                  Kill
                 </button>
-             </div>
+              </div>
 
-             {isCameraEnabled && (
-               <div className="flex items-center justify-between pt-2 border-t border-brand-border/30">
-                  <div className="flex flex-col">
-                     <span className="text-[10px] text-brand-text-dim uppercase font-bold tracking-tight">Vision Continue</span>
-                     <span className="text-[9px] text-brand-primary/60 font-mono tracking-tighter">High-freq Analysis</span>
-                  </div>
-                  <button 
-                    onClick={() => setIsVisionContinue(!isVisionContinue)} 
-                    className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all border ${isVisionContinue ? 'bg-brand-primary/20 border-brand-primary text-brand-primary shadow-[0_0_10px_rgba(var(--color-brand-primary-rgb),0.2)]' : 'bg-black/40 border-brand-border text-brand-text-dim'}`}
-                  >
-                    {isVisionContinue ? 'ACTIVE' : 'INACTIVE'}
-                  </button>
-               </div>
-             )}
+              <div className="relative aspect-video bg-black rounded-2xl border border-brand-border overflow-hidden shadow-2xl group/camera">
+                <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1] brightness-[1.1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 border-[0.5px] border-brand-primary/10 pointer-events-none" />
 
-             <AnimatePresence>
-                {isCameraEnabled && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
-                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                    className="relative aspect-video bg-black rounded-xl border border-brand-border overflow-hidden shadow-inner flex items-center justify-center group"
-                  >
-                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1]" />
-                    <div className="absolute inset-0 border-[0.5px] border-brand-primary/20 pointer-events-none" />
-                    <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
-                      <span className="text-[8px] font-mono text-brand-primary tracking-widest uppercase">REC</span>
-                    </div>
-                  </motion.div>
-                )}
-             </AnimatePresence>
-          </div>
-        </div>
+                {/* Viewport Marks */}
+                <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-brand-primary/40 rounded-tl" />
+                <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-brand-primary/40 rounded-tr" />
+                <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-brand-primary/40 rounded-bl" />
+                <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-brand-primary/40 rounded-br" />
+
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/camera:opacity-100 transition-opacity">
+                  <span className="text-[8px] font-mono bg-black/60 backdrop-blur px-2 py-1 rounded border border-white/5 tracking-widest uppercase">
+                    {isVisionContinue ? 'HI_RES_SYNC' : 'STD_OPTIC'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Network Stats */}
-      <div className="mt-auto grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1 p-3 rounded-2xl bg-black/20 border border-brand-border">
-          <span className="text-[9px] text-brand-text-dim uppercase font-mono">Capture</span>
-          <span className="text-xs font-mono">16.0 kHz</span>
-        </div>
-        <div className="flex flex-col gap-1 p-3 rounded-2xl bg-black/20 border border-brand-border">
-          <span className="text-[9px] text-brand-text-dim uppercase font-mono">Playback</span>
-          <span className="text-xs font-mono">24.0 kHz</span>
-        </div>
-      </div>
+
     </aside>
   );
 };
