@@ -20,7 +20,7 @@ Cette feuille de route définit les étapes de développement pour l'écosystèm
 - [x] **Configuration de Voix** : Sélecteur de signatures vocales intégré.
 
 ## Phase 4 : Persistance & Contextualisation (Prochaines Étapes)
-- [ ] **Mémoire à Long Terme** : Intégration d'une base de données vectorielle (Vector DB) pour que l'IA se souvienne des interactions passées.
+- [x] **Mémoire à Long Terme** : Intégration d'une base de données vectorielle (Vector DB) pour que l'IA se souvienne des interactions passées.
 - [ ] **Exportation Multimodale** : Téléchargement des sessions avec transcriptions et captures visuelles.
 - [ ] **Multi-Sessions** : Support pour plusieurs "personnalités" d'IA interchangeables rapidement.
 - [ ] **Gestion des Erreurs Robuste** : Système de reconnexion automatique avec état de persistence.
