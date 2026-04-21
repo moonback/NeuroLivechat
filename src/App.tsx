@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLiveAPI } from './hooks/useLiveAPI';
 import { useCamera } from './hooks/useCamera';
 import { useWaveform } from './hooks/useWaveform';
@@ -9,13 +9,20 @@ import { MainVisualizer } from './components/MainVisualizer';
 import { ChatTranscript } from './components/ChatTranscript';
 import { ControlFooter } from './components/ControlFooter';
 
-import { SYSTEM_INSTRUCTION } from './constants/prompts';
+import { getSystemInstruction } from './constants/prompts';
+import { loadSkills } from './utils/skillLoader';
 
 export default function App() {
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [voiceName, setVoiceName] = useState('Puck');
   const [smartLight, setSmartLight] = useState('#00FF9C');
   const [showDevPanel, setShowDevPanel] = useState(true);
+  const [skills, setSkills] = useState('');
+
+  // Load Skills on Mount
+  useEffect(() => {
+    loadSkills().then(setSkills);
+  }, []);
 
   // Tool Handler
   const handleToolCall = useCallback(async (call: any) => {
@@ -42,7 +49,7 @@ export default function App() {
   } = useLiveAPI({
     apiKey: process.env.GEMINI_API_KEY || '',
     voiceName,
-    systemInstruction: SYSTEM_INSTRUCTION,
+    systemInstruction: getSystemInstruction(skills),
     onToolCall: handleToolCall
   });
 
