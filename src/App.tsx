@@ -82,11 +82,16 @@ export default function App() {
     onToolCall: handleToolCall
   });
 
+  // Stabilize the onFrame handler
+  const handleFrame = useCallback((data: string) => {
+    sendRealtimeInput({ video: { mimeType: 'image/webp', data } });
+  }, [sendRealtimeInput]);
+
   // Camera Hook
   const { videoRef } = useCamera({
     isCameraEnabled,
     isVisionContinue,
-    onFrame: (data) => sendRealtimeInput({ video: { mimeType: 'image/jpeg', data } })
+    onFrame: handleFrame
   });
 
   // Waveform Hook

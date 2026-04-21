@@ -377,6 +377,9 @@ export const useLiveAPI = ({ apiKey, voiceName, systemInstruction, onToolCall }:
 
   const sendRealtimeInput = useCallback((data: any) => {
     if (sessionRef.current) {
+      if (data.video) {
+        console.log('[Multimodal] Sending video frame...');
+      }
       sessionRef.current.sendRealtimeInput(data);
     }
   }, []);
