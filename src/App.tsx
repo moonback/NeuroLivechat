@@ -9,7 +9,7 @@ import { MainVisualizer } from './components/MainVisualizer';
 import { ChatTranscript } from './components/ChatTranscript';
 import { ControlFooter } from './components/ControlFooter';
 
-const SYSTEM_INSTRUCTION = "Tu es un assistant vocal utile, sympa et concis. Tu réponds toujours en français. Ton identité technique est IA. Tu as accès à des capteurs: tu peux voir l'utilisateur (via webcam), tu peux récupérer la météo locale avec get_weather, et tu peux contrôler l'éclairage de la salle via set_light_color (donne des couleurs sympas Hexa ou HTML codenames).";
+import { SYSTEM_INSTRUCTION } from './constants/prompts';
 
 export default function App() {
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
