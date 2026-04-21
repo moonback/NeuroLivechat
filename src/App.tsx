@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI, Modality } from '@google/genai';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
+import { GoogleGenAI, Modality, Type } from '@google/genai';
+import { Mic, MicOff, Loader2, Camera, CameraOff, Settings2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const SYSTEM_INSTRUCTION = "Tu es un assistant vocal utile, sympa et concis. Tu réponds toujours en français. Ton identité est Puck, un assistant technique.";
+const SYSTEM_INSTRUCTION = "Tu es un assistant vocal utile, sympa et concis. Tu réponds toujours en français. Ton identité technique est IA. Tu as accès à des capteurs: tu peux voir l'utilisateur (via webcam), tu peux récupérer la météo locale avec get_weather, et tu peux contrôler l'éclairage de la salle via set_light_color (donne des couleurs sympas Hexa ou HTML codenames).";
 
 export default function App() {
   const [isConnected, setIsConnected] = useState(false);
@@ -19,6 +19,22 @@ export default function App() {
   const nextPlayTimeRef = useRef<number>(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
+  const [voiceName, setVoiceName] = useState('Puck');
+  const [showDevPanel, setShowDevPanel] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  const [smartLight, setSmartLight] = useState('#16181b');
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+  const frameIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const barsRef = useRef<(HTMLDivElement | null)[]>([]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -28,6 +44,52 @@ export default function App() {
       handleDisconnect();
     };
   }, []);
+
+  const drawWaveform = () => {
+    if (!analyserRef.current || !dataArrayRef.current) return;
+    animationRef.current = requestAnimationFrame(drawWaveform);
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    
+    const step = Math.floor(dataArrayRef.current.length / 9);
+    for (let i = 0; i < 9; i++) {
+       const bar = barsRef.current[i];
+       if (bar) {
+          const value = dataArrayRef.current[i * step] || 0;
+          const height = 40 + (value / 255) * 160;
+          bar.style.height = `${height}px`;
+          if (i > 2 && i < 6) {
+             bar.style.backgroundColor = value > 200 ? 'var(--color-hw-error)' : 'white';
+          } else {
+             bar.style.backgroundColor = value > 200 ? 'white' : 'var(--color-hw-accent)';
+          }
+       }
+    }
+  };
+
+  const startCamera = async (session: any) => {
+    if (!isCameraEnabled) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
+      cameraStreamRef.current = stream;
+      if (videoRef.current) videoRef.current.srcObject = stream;
+      
+      frameIntervalRef.current = setInterval(() => {
+        if (videoRef.current && canvasRef.current && session) {
+          const ctx = canvasRef.current.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+            const base64Str = canvasRef.current.toDataURL('image/jpeg', 0.5).split(',')[1];
+            session.sendRealtimeInput({
+              video: {
+                mimeType: 'image/jpeg',
+                data: base64Str
+              }
+            });
+          }
+        }
+      }, 2000);
+    } catch (e) { console.error('Camera error', e); }
+  };
 
   const appendMessage = (role: 'user' | 'assistant', text: string) => {
     setMessages((prev) => {
@@ -70,6 +132,10 @@ export default function App() {
       const source = ctx.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(ctx.destination);
+
+      if (analyserRef.current) {
+        source.connect(analyserRef.current);
+      }
 
       const currentTime = ctx.currentTime;
       if (nextPlayTimeRef.current < currentTime) {
@@ -141,6 +207,23 @@ export default function App() {
   };
 
   const handleMessage = (message: any) => {
+    if (message.toolCall) {
+      const functionResponses = message.toolCall.functionCalls.map((call: any) => {
+        let res = {};
+        if (call.name === "get_weather") {
+          res = { temperature: "21°C", condition: "Pluvieux", location: call.args.location };
+        } else if (call.name === "set_light_color") {
+          setSmartLight(call.args.color || '#00FF9C');
+          res = { status: "success", applied_color: call.args.color };
+        }
+        appendMessage('assistant', `[SYSTEM CALL] ${call.name} executed.`);
+        return { id: call.id, name: call.name, response: res };
+      });
+      if (sessionRef.current) {
+        sessionRef.current.sendToolResponse({ functionResponses });
+      }
+    }
+
     // Interruption logic
     if (message.serverContent?.interrupted) {
       activeSourcesRef.current.forEach((source) => {
@@ -197,23 +280,51 @@ export default function App() {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       nextPlayTimeRef.current = audioContextRef.current.currentTime;
 
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 64;
+      dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+      drawWaveform();
+
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const sessionPromise = ai.live.connect({
         model: 'gemini-3.1-flash-live-preview',
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } },
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } },
           },
           systemInstruction: SYSTEM_INSTRUCTION,
           inputAudioTranscription: {},
           outputAudioTranscription: {},
+          tools: [{
+            functionDeclarations: [
+              {
+                name: "get_weather",
+                description: "Obtenir la météo locale",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { location: { type: Type.STRING, description: "Nom de la ville" } },
+                  required: ["location"]
+                }
+              },
+              {
+                name: "set_light_color",
+                description: "Changer la couleur domotique RVB",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: { color: { type: Type.STRING, description: "Couleur (code hexa ou nom anglais)" } },
+                  required: ["color"]
+                }
+              }
+            ]
+          }]
         },
         callbacks: {
           onopen: () => {
             sessionPromise.then((session: any) => {
               sessionRef.current = session;
               startRecording(session);
+              startCamera(session);
               setIsConnected(true);
               setIsConnecting(false);
             });
@@ -258,6 +369,14 @@ export default function App() {
       streamRef.current = null;
     }
 
+    if (frameIntervalRef.current) clearInterval(frameIntervalRef.current);
+    if (cameraStreamRef.current) cameraStreamRef.current.getTracks().forEach((t) => t.stop());
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    
+    frameIntervalRef.current = null;
+    cameraStreamRef.current = null;
+    animationRef.current = null;
+
     setIsConnected(false);
     setIsConnecting(false);
     setIsAssistantTalking(false);
@@ -292,9 +411,42 @@ export default function App() {
             <div className="text-sm font-medium text-[var(--color-hw-text)]">gemini-3.1-flash-live-preview</div>
           </div>
           <div className="bg-[var(--color-hw-panel-light)] border border-[var(--color-hw-panel-border)] rounded-lg p-4">
-            <span className="font-mono text-[10px] text-[var(--color-hw-text-dim)] uppercase mb-2 block">Voice Configuration</span>
-            <div className="text-sm font-medium text-[var(--color-hw-text)]">Puck (Male / Energetic)</div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-mono text-[10px] text-[var(--color-hw-text-dim)] uppercase">Voice Config</span>
+              {showDevPanel && <Settings2 className="w-3 h-3 text-[var(--color-hw-accent)]" />}
+            </div>
+            <div className="text-sm font-medium text-[var(--color-hw-text)]">
+              {showDevPanel ? (
+                <select className="bg-transparent border-b border-[var(--color-hw-panel-border)] outline-none text-[var(--color-hw-accent)] w-full pb-1" value={voiceName} onChange={e => setVoiceName(e.target.value)} disabled={isConnected}>
+                  <option value="Puck">Puck</option>
+                  <option value="Charon">Charon</option>
+                  <option value="Kore">Kore</option>
+                  <option value="Fenrir">Fenrir</option>
+                  <option value="Zephyr">Zephyr</option>
+                </select>
+              ) : (
+                <span className="capitalize">{voiceName} (Active)</span>
+              )}
+            </div>
           </div>
+
+          <AnimatePresence>
+             {showDevPanel && (
+               <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="bg-[var(--color-hw-panel-light)] border border-[var(--color-hw-panel-border)] rounded-lg p-4 overflow-hidden overflow-visible relative">
+                 <div className="flex justify-between items-center mb-3">
+                   <span className="font-mono text-[10px] text-[var(--color-hw-text-dim)] uppercase">Optic Sensor</span>
+                   <button onClick={() => !isConnected && setIsCameraEnabled(!isCameraEnabled)} disabled={isConnected} className={`p-1.5 rounded disabled:opacity-50 ${isCameraEnabled ? 'bg-[var(--color-hw-accent)] text-black' : 'bg-[#333] text-white'}`}>
+                     {isCameraEnabled ? <Camera className="w-3 h-3" /> : <CameraOff className="w-3 h-3" />}
+                   </button>
+                 </div>
+                 <div className="w-full aspect-video bg-black rounded relative border border-[#333] overflow-hidden flex items-center justify-center">
+                    {isCameraEnabled && <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover"></video>}
+                    <canvas ref={canvasRef} width={320} height={240} className="hidden" />
+                    {!isCameraEnabled && <div className="text-[10px] font-mono text-[#555] absolute">OFFLINE</div>}
+                 </div>
+               </motion.div>
+             )}
+          </AnimatePresence>
           
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[var(--color-hw-panel-light)] border border-[var(--color-hw-panel-border)] rounded-lg p-4">
@@ -340,15 +492,14 @@ export default function App() {
           <div className="flex-none h-48 md:h-auto md:flex-1 border border-dashed border-[#444] rounded-xl flex items-center justify-center relative overflow-hidden" 
                style={{ background: 'radial-gradient(circle at center, #16181b 0%, #0f1012 100%)' }}>
             
-            {/* Waveform bars */}
+            {/* Waveform bars connected to FFT */}
             <div className="flex items-center justify-center h-full gap-1.5">
-               {[40, 80, 120, 160, 200, 160, 120, 80, 40].map((baseHeight, i) => {
-                  const isActive = isConnected && (isAssistantTalking || activeSourcesRef.current.length > 0);
-                  const h = isActive ? `${baseHeight}px` : '40px';
-                  const bg = (i > 2 && i < 6) ? 'white' : 'var(--color-hw-accent)';
+               {[0,1,2,3,4,5,6,7,8].map((i) => {
                   return (
-                    <div key={i} className="w-1 md:w-1.5 rounded-full transition-all duration-150 ease-out" 
-                         style={{ height: h, background: bg, opacity: 0.8 }}></div>
+                    <div key={i} 
+                         ref={(el) => { barsRef.current[i] = el; }}
+                         className="w-1 md:w-1.5 rounded-full transition-all duration-[50ms]" 
+                         style={{ height: '40px', backgroundColor: 'var(--color-hw-accent)', opacity: 0.8 }}></div>
                   );
                })}
             </div>
@@ -421,9 +572,25 @@ export default function App() {
              <div className={`text-[11px] ${isConnected ? 'text-[var(--color-hw-accent)]' : 'text-[var(--color-hw-text-dim)]'}`}>{isConnected ? 'SECURE_LINK_ACTIVE' : 'IDLE_STATE'}</div>
            </div>
            
-           <div className="border-l border-[var(--color-hw-panel-border)] pl-6 min-h-[40px] flex flex-col justify-center">
+           <div className="border-l border-[var(--color-hw-panel-border)] pl-6 min-h-[40px] flex flex-col justify-center min-w-[120px]">
+             <span className="font-mono text-[9px] text-[var(--color-hw-text-dim)] uppercase mb-0.5 tracking-widest block">Environment</span>
+             <div className="flex items-center gap-2 text-[11px]">
+                <div className="w-3 h-3 rounded-full border border-[#333] shadow-[inset_0_0_5px_rgba(0,0,0,0.5)] transition-colors duration-500" style={{ backgroundColor: smartLight, boxShadow: `0 0 10px ${smartLight}` }}></div>
+                <span className="opacity-80">{smartLight}</span>
+             </div>
+           </div>
+           
+           <div 
+             className="border-l border-[var(--color-hw-panel-border)] pl-6 min-h-[40px] flex flex-col justify-center cursor-crosshair select-none"
+             onClick={() => {
+               setClickCount(c => {
+                 if (c + 1 >= 4) { setShowDevPanel(true); return 0; }
+                 return c + 1;
+               })
+             }}
+           >
              <span className="font-mono text-[9px] text-[var(--color-hw-text-dim)] uppercase mb-0.5 tracking-widest block">SDK Version</span>
-             <div className="text-[11px] text-[var(--color-hw-text)]">@google/genai</div>
+             <div className="text-[11px] text-[var(--color-hw-text)]">@google/genai {clickCount > 0 ? `(${clickCount})` : ''}</div>
            </div>
         </footer>
 
