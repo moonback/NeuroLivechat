@@ -124,9 +124,19 @@ export default function App() {
   const { barHeights, isHighVolume } = useWaveform({ analyser });
 
   return (
-    <div className="h-screen w-full flex items-center justify-center p-0 md:p-8 lg:p-10 overflow-hidden bg-brand-bg text-brand-text">
+    <div
+      className="h-screen w-full flex items-center justify-center p-0 md:p-8 lg:p-10 overflow-hidden text-brand-text relative bg-brand-bg"
+      style={{
+        backgroundImage: `url('/back.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      {/* Background Overlay for better contrast */}
+      <div className="absolute inset-0 bg-brand-bg/40 backdrop-blur-[2px]" />
+
       {/* Main Structural Shell */}
-      <div className="w-full h-full max-w-[1480px] max-h-[920px] grid grid-rows-[auto_1fr_auto] lg:grid-cols-[340px_1fr] lg:grid-rows-[auto_1fr_auto] glass rounded-none md:rounded-[2rem] overflow-hidden shadow-premium relative">
+      <div className="w-full h-full max-w-[1480px] max-h-[920px] grid grid-rows-[auto_1fr_auto] lg:grid-cols-[340px_1fr] lg:grid-rows-[auto_1fr_auto] glass rounded-none md:rounded-[2rem] overflow-hidden shadow-premium relative z-10">
 
         {/* Top Navigation */}
         <Header
