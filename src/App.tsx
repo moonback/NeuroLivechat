@@ -12,7 +12,7 @@ import { ControlFooter } from './components/ControlFooter';
 import { SettingsModal } from './components/SettingsModal';
 
 import { getSystemInstruction } from './constants/prompts';
-import { taskService } from './utils/taskService';
+import { taskService, Task } from './utils/taskService';
 import { loadSkills } from './utils/skillLoader';
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showDevPanel, setShowDevPanel] = useState(true);
   const [skills, setSkills] = useState('');
+  const [tasks, setTasks] = useState(taskService.getAll());
   const [taskCount, setTaskCount] = useState(taskService.getPendingCount());
   const [isVisionContinue, setIsVisionContinue] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -46,12 +47,13 @@ export default function App() {
       } else if (action === "remove" && text) {
         taskService.remove(text);
       }
-      const tasks = taskService.getAll();
+      const updatedTasks = taskService.getAll();
+      setTasks(updatedTasks);
       setTaskCount(taskService.getPendingCount());
-      return { status: "success", tasks: tasks.map(t => t.text) };
+      return { status: "success", tasks: updatedTasks.map(t => t.text) };
     } else if (call.name === "get_info") {
-      return { 
-        time: new Date().toLocaleTimeString(), 
+      return {
+        time: new Date().toLocaleTimeString(),
         date: new Date().toLocaleDateString(),
         platform: navigator.platform,
         userAgent: navigator.userAgent
@@ -70,7 +72,7 @@ export default function App() {
         // En conditions réelles, on utiliserait une API comme Google Custom Search ou SerpApi.
         // Pour la démo, on simule une recherche avec des résultats structurés.
         console.log(`[Web Search] Query: ${query}`);
-        
+
         // Simulation d'un délai réseau
         await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -125,16 +127,18 @@ export default function App() {
     <div className="h-screen w-full flex items-center justify-center p-0 md:p-8 lg:p-10 overflow-hidden bg-brand-bg text-brand-text">
       {/* Main Structural Shell */}
       <div className="w-full h-full max-w-[1480px] max-h-[920px] grid grid-rows-[auto_1fr_auto] lg:grid-cols-[340px_1fr] lg:grid-rows-[auto_1fr_auto] glass rounded-none md:rounded-[2rem] overflow-hidden shadow-premium relative">
-        
+
         {/* Top Navigation */}
-        <Header 
-          isConnected={isConnected} 
-          isConnecting={isConnecting} 
+        <Header
+          isConnected={isConnected}
+          isConnecting={isConnecting}
           isReconnecting={isReconnecting}
+          onConnect={connect}
+          onDisconnect={disconnect}
         />
 
         {/* Control Center (Sidebar) */}
-        <Sidebar 
+        <Sidebar
           isConnected={isConnected}
           isConnecting={isConnecting}
           isReconnecting={isReconnecting}
@@ -149,13 +153,20 @@ export default function App() {
           videoRef={videoRef}
           showDevPanel={showDevPanel}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          tasks={tasks}
+          onRemoveTask={(id) => {
+            taskService.remove(id);
+            const updated = taskService.getAll();
+            setTasks(updated);
+            setTaskCount(taskService.getPendingCount());
+          }}
         />
 
         {/* Primary Interaction Surface */}
         <main className="flex flex-col p-5 lg:p-8 gap-5 overflow-hidden bg-brand-bg/40">
-          
+
           {/* Visual Resonance Area */}
-          <MainVisualizer 
+          <MainVisualizer
             isConnected={isConnected}
             isConnecting={isConnecting}
             isReconnecting={isReconnecting}
@@ -172,7 +183,7 @@ export default function App() {
         </main>
 
         {/* Global Telemetry Bar */}
-        <ControlFooter 
+        <ControlFooter
           taskCount={taskCount}
           messageCount={messages.length}
           isConnected={isConnected}
@@ -180,7 +191,7 @@ export default function App() {
 
       </div>
 
-      <SettingsModal 
+      <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         voiceName={voiceName}
