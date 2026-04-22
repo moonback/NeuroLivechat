@@ -69,35 +69,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Content Scroller */}
             <div className="px-8 pb-10 flex flex-col gap-9 overflow-y-auto max-h-[70vh]">
-              
+
               {/* ── Section: Voice ── */}
               <section className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 px-1">
                   <Mic className="w-3.5 h-3.5 text-brand-accent/60" />
                   <h3 className="text-[11px] uppercase font-bold tracking-[0.15em] text-white/25">Vocal Signature</h3>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-2">
                   {voices.map((voice) => (
                     <button
                       key={voice}
                       onClick={() => !isConnected && setVoiceName(voice)}
                       disabled={isConnected}
-                      className={`flex items-center justify-between p-4 rounded-2xl transition-all duration-300 btn-press group ${
-                        voiceName === voice
-                          ? 'bg-brand-accent/15 border border-brand-accent/20 text-white'
-                          : 'bg-white/[0.03] border border-white/[0.05] text-white/40 hover:border-white/[0.08] hover:bg-white/[0.05]'
-                      } ${isConnected ? 'opacity-40 cursor-not-allowed border-dashed' : ''}`}
+                      className={`flex items-center justify-between p-4 rounded-2xl transition-all duration-300 btn-press group ${voiceName === voice
+                        ? 'bg-brand-accent/15 border border-brand-accent/20 text-white'
+                        : 'bg-white/[0.03] border border-white/[0.05] text-white/40 hover:border-white/[0.08] hover:bg-white/[0.05]'
+                        } ${isConnected ? 'opacity-40 cursor-not-allowed border-dashed' : ''}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                          voiceName === voice ? 'bg-brand-accent text-white scale-110 shadow-lg shadow-brand-accent/20' : 'bg-white/[0.02] text-transparent group-hover:text-white/10'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${voiceName === voice ? 'bg-brand-accent text-white scale-110 shadow-lg shadow-brand-accent/20' : 'bg-white/[0.02] text-transparent group-hover:text-white/10'
+                          }`}>
                           <Sparkles className="w-3.5 h-3.5" />
                         </div>
                         <span className="text-[14px] font-semibold tracking-tight">{voice}</span>
                       </div>
-                      
+
                       {voiceName === voice ? (
                         <div className="w-5 h-5 rounded-full bg-brand-accent flex items-center justify-center shadow-lg shadow-brand-accent/20">
                           <div className="w-1.5 h-1.5 rounded-full bg-white" />
@@ -125,29 +123,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Camera className="w-3.5 h-3.5 text-brand-accent/60" />
                   <h3 className="text-[11px] uppercase font-bold tracking-[0.15em] text-white/25">Optic Processing</h3>
                 </div>
-                
+
                 <div className="flex flex-col gap-3">
                   {/* Camera Enable Toggle */}
                   <button
                     onClick={() => !isConnected && setIsCameraEnabled(!isCameraEnabled)}
                     disabled={isConnected}
-                    className={`flex items-center justify-between p-5 rounded-2xl transition-all duration-300 btn-press group ${
-                      isCameraEnabled 
-                        ? 'bg-brand-accent/10 border border-brand-accent/20' 
-                        : 'bg-white/[0.03] border border-white/[0.05]'
-                    } ${isConnected ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`flex items-center justify-between p-5 rounded-2xl transition-all duration-300 btn-press group ${isCameraEnabled
+                      ? 'bg-brand-accent/10 border border-brand-accent/20'
+                      : 'bg-white/[0.03] border border-white/[0.05]'
+                      } ${isConnected ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex flex-col items-start gap-0.5">
                       <span className={`text-[14px] font-semibold ${isCameraEnabled ? 'text-white' : 'text-white/60'}`}>Primary Optical Sensor</span>
                       <span className="text-[11px] text-white/20 font-medium group-hover:text-white/30 transition-colors">Route video feed into model context</span>
                     </div>
-                    
-                    <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${
-                      isCameraEnabled ? 'bg-brand-accent' : 'bg-white/10'
-                    }`}>
-                      <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300 shadow-sm ${
-                        isCameraEnabled ? 'left-[23px] bg-white' : 'left-[3px] bg-white/40'
-                      }`} />
+
+                    <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${isCameraEnabled ? 'bg-brand-accent' : 'bg-white/10'
+                      }`}>
+                      <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300 shadow-sm ${isCameraEnabled ? 'left-[23px] bg-white' : 'left-[3px] bg-white/40'
+                        }`} />
                     </div>
                   </button>
 
@@ -162,11 +157,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       >
                         <button
                           onClick={() => setIsVisionContinue(!isVisionContinue)}
-                          className={`flex items-center justify-between w-full p-5 rounded-2xl transition-all duration-300 btn-press group ${
-                            isVisionContinue 
-                              ? 'bg-purple-500/10 border border-purple-500/20' 
-                              : 'bg-white/[0.03] border border-white/[0.05]'
-                          }`}
+                          className={`flex items-center justify-between w-full p-5 rounded-2xl transition-all duration-300 btn-press group ${isVisionContinue
+                            ? 'bg-purple-500/10 border border-purple-500/20'
+                            : 'bg-white/[0.03] border border-white/[0.05]'
+                            }`}
                         >
                           <div className="flex flex-col items-start gap-0.5">
                             <div className="flex items-center gap-2">
@@ -176,12 +170,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <span className="text-[11px] text-white/20 font-medium group-hover:text-white/30 transition-colors">Deep visual understanding (Continuous mode)</span>
                           </div>
 
-                          <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${
-                            isVisionContinue ? 'bg-purple-500' : 'bg-white/10'
-                          }`}>
-                            <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300 shadow-sm ${
-                              isVisionContinue ? 'left-[23px] bg-white' : 'left-[3px] bg-white/40'
-                            }`} />
+                          <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${isVisionContinue ? 'bg-purple-500' : 'bg-white/10'
+                            }`}>
+                            <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300 shadow-sm ${isVisionContinue ? 'left-[23px] bg-white' : 'left-[3px] bg-white/40'
+                              }`} />
                           </div>
                         </button>
                       </motion.div>
@@ -193,12 +185,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Footer Information */}
             <div className="mt-auto px-8 py-6 bg-white/[0.02] border-t border-white/[0.04] flex items-center justify-between">
-               <span className="text-[10px] font-bold text-white/10 tracking-[0.2em] uppercase">Core Unit v4.0.0</span>
-               <div className="flex items-center gap-1.5 opacity-20">
-                 <div className="w-1 h-1 rounded-full bg-white" />
-                 <div className="w-1 h-1 rounded-full bg-white" />
-                 <div className="w-1 h-1 rounded-full bg-white" />
-               </div>
+              <span className="text-[10px] font-bold text-white/10 tracking-[0.2em] uppercase">Core Unit v4.0.0</span>
+              <div className="flex items-center gap-1.5 opacity-20">
+                <div className="w-1 h-1 rounded-full bg-white" />
+                <div className="w-1 h-1 rounded-full bg-white" />
+                <div className="w-1 h-1 rounded-full bg-white" />
+              </div>
             </div>
           </motion.div>
         </div>
